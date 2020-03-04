@@ -1,17 +1,20 @@
 import React, { Component } from 'react'
+import uuid from 'uuid';
+import PropTypes from 'prop-types';
+
+const stateInicial = {
+    cita : {
+        mascota: '',
+        propietario: '',
+        fecha: '',
+        hora: '',
+        sintomas: ''
+    },
+    error: false
+}
 
 class NuevaCita extends Component {
-    state = {
-        cita : {
-            mascota: '',
-            propietario: '',
-            facha: '',
-            hora: '',
-            sintomas: ''
-        },
-        error: false        
-    }
-
+    state = {...stateInicial}
 
     // Cuando el usuario escribe en los input.
     handleChange = e => {
@@ -38,18 +41,35 @@ class NuevaCita extends Component {
             return;
         }
 
-        // Agregar cita al state de App.
+        // generar objeto con los datos
+        const nuevaCita = {...this.state.cita}
+        nuevaCita.id = uuid();
 
+        // Agregar cita al state de App.
+        this.props.crearNuevaCita(nuevaCita);
+
+        // StateInicial en State.
+        this.setState({
+            ...stateInicial
+        })
     }
 
-    render() { 
+    render() {
+        
+        const { error } = this.state;
+        
         return (
-            <div className="card mt-5 py-5">
+            <div className="card mt-3 py-3">
                 <div className="card-body">
-                    <h2 className="card-title text-center mb-5">
+                    <h2 className="card-title text-center mb-3">
                         Llena el formulario para crear una nueva cita
                     </h2>
-                    <form>
+
+                    {error ? <div className="alert alert-danger mt-2 mb-5 text-center">Todos los campos son obligatorios</div> : null}
+
+                    <form
+                        onSubmit = {this.handleSumit}
+                    >
                         <div className="form-group row">
                             <label className="col-sm-4 col-lg-2 col-form-label">Nombre Mascota</label>
                             <div className="col-sm-8 col-lg-10">
@@ -57,7 +77,7 @@ class NuevaCita extends Component {
                                 type="text"
                                 className="form-control"
                                 placeholder="Nombre Mascota"
-                                name="mascota" oid
+                                name="mascota"
                                 onChange={this.handleChange}
                                 value={this.state.cita.mascota}                                
                                 />
@@ -123,5 +143,10 @@ class NuevaCita extends Component {
         );
     }
 }
+
+NuevaCita.propTypes = {
+    crearNuevaCita : PropTypes.func.isRequired
+}
+
  
 export default NuevaCita;
